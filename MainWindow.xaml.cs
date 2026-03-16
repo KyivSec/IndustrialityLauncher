@@ -1,4 +1,5 @@
-﻿using Microsoft.UI;
+﻿using LauncherApp.Services;
+using Microsoft.UI;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
