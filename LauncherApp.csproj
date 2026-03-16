@@ -24,10 +24,14 @@
   <ItemGroup>
     <Compile Remove="LauncherJsonContext.cs" />
     <Compile Remove="Assets\Backgrounds\**" />
+    <Compile Remove="LauncherBootstrapper\**" />
     <Content Remove="Assets\Backgrounds\**" />
     <EmbeddedResource Remove="Assets\Backgrounds\**" />
+    <EmbeddedResource Remove="LauncherBootstrapper\**" />
     <None Remove="Assets\Backgrounds\**" />
+    <None Remove="LauncherBootstrapper\**" />
     <Page Remove="Assets\Backgrounds\**" />
+    <Page Remove="LauncherBootstrapper\**" />
   </ItemGroup>
 
 	<ItemGroup>
@@ -135,4 +139,8 @@
 		</ItemGroup>
 		<RemoveDir Directories="@(RemovingFolders)" />
 	</Target>
+
+	<ItemGroup>
+	  <PRIResource Remove="LauncherBootstrapper\**" />
+	</ItemGroup>
 </Project>
