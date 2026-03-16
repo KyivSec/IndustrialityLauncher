@@ -170,7 +170,7 @@ public sealed class ModpackService
 
         string Json = await Response.Content.ReadAsStringAsync(CancellationToken).ConfigureAwait(false);
 
-        GitHubReleaseInfo? ReleaseInfo = JsonSerializer.Deserialize<GitHubReleaseInfo>(Json);
+        GitHubReleaseInfo? ReleaseInfo = JsonSerializer.Deserialize(Json, LauncherJsonContext.Default.GitHubReleaseInfo);
         if (ReleaseInfo is null || string.IsNullOrWhiteSpace(ReleaseInfo.TagName))
         {
             throw new InvalidOperationException("Could not resolve latest modpack version from GitHub.");
@@ -189,9 +189,5 @@ public sealed class ModpackService
         return File.ReadAllText(Paths.ModpackVersionFilePath).Trim();
     }
 
-    private sealed class GitHubReleaseInfo
-    {
-        [JsonPropertyName("tag_name")]
-        public string TagName { get; set; } = string.Empty;
-    }
+
 }

@@ -1,5 +1,4 @@
-﻿using LauncherApp.Services;
-using Microsoft.UI;
+﻿using Microsoft.UI;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -20,8 +19,6 @@ namespace LauncherApp
 {
     public sealed partial class MainWindow : Window
     {
-        private readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
-
         private UiSettings CurrentSettings = new();
         private LauncherService? LauncherService;
         private string SettingsFilePath = string.Empty;
@@ -126,7 +123,7 @@ namespace LauncherApp
                 if (File.Exists(SettingsFilePath))
                 {
                     string Json = await File.ReadAllTextAsync(SettingsFilePath);
-                    UiSettings? LoadedSettings = JsonSerializer.Deserialize<UiSettings>(Json);
+                    UiSettings? LoadedSettings = JsonSerializer.Deserialize(Json, LauncherJsonContext.Default.UiSettings);
 
                     if (LoadedSettings is not null)
                     {
@@ -170,7 +167,7 @@ namespace LauncherApp
                 MaxRamMb = MaxRamMb
             };
 
-            string Json = JsonSerializer.Serialize(CurrentSettings, JsonOptions);
+            string Json = JsonSerializer.Serialize(CurrentSettings, LauncherJsonContext.Default.UiSettings);
             await File.WriteAllTextAsync(SettingsFilePath, Json);
 
             ApplySettingsToService();
@@ -402,11 +399,5 @@ namespace LauncherApp
             await Dialog.ShowAsync();
         }
 
-        private sealed class UiSettings
-        {
-            public string Username { get; set; } = string.Empty;
-            public int MinRamMb { get; set; } = 512;
-            public int MaxRamMb { get; set; } = 4096;
-        }
     }
 }

@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Management;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,6 +18,7 @@ public sealed class LauncherService
     private readonly PlayService PlayService;
     private readonly Paths Paths;
     private string? InstalledVersionId;
+    private Process? GameProcess;
 
     public string RootDirectory => Paths.RootDirectory;
     public string RuntimeDirectory => Paths.RuntimeDirectory;
@@ -76,6 +80,7 @@ public sealed class LauncherService
         if (PathsChanged)
         {
             InstalledVersionId = null;
+            GameProcess = null;
             JavaService.ResetCache();
         }
 
@@ -152,7 +157,58 @@ public sealed class LauncherService
             InstalledVersionId = VersionId;
         }
 
+        HashSet<int> ExistingJavaProcessIds = GetJavaProcessIds();
+        DateTime LaunchStartUtc = DateTime.UtcNow;
+
         await PlayService.PlayAsync(VersionId, CancellationToken).ConfigureAwait(false);
+
+        GameProcess = await WaitForGameProcessAsync(ExistingJavaProcessIds, LaunchStartUtc, CancellationToken).ConfigureAwait(false);
+    }
+
+    public bool IsGameRunning()
+    {
+        if (GameProcess is not null)
+        {
+            try
+            {
+                if (!GameProcess.HasExited)
+                {
+                    return true;
+                }
+            }
+            catch
+            {
+            }
+
+            GameProcess = null;
+        }
+
+        GameProcess = TryFindRunningGameProcess();
+        return GameProcess is not null;
+    }
+
+    public void TerminateGame()
+    {
+        if (!IsGameRunning() || GameProcess is null)
+        {
+            return;
+        }
+
+        try
+        {
+            if (!GameProcess.HasExited)
+            {
+                GameProcess.Kill(true);
+                GameProcess.WaitForExit(5000);
+            }
+        }
+        catch
+        {
+        }
+        finally
+        {
+            GameProcess = null;
+        }
     }
 
     public void OpenRootFolder()
@@ -186,10 +242,141 @@ public sealed class LauncherService
         }
 
         InstalledVersionId = null;
+        GameProcess = null;
     }
 
     public Task<ModpackUpdateInfo> GetModpackUpdateInfoAsync(CancellationToken CancellationToken = default)
     {
         return ModpackService.GetModpackUpdateInfoAsync(CancellationToken);
+    }
+
+    private async Task<Process?> WaitForGameProcessAsync(HashSet<int> ExistingJavaProcessIds, DateTime LaunchStartUtc, CancellationToken CancellationToken)
+    {
+        for (int Attempt = 0; Attempt < 30; Attempt++)
+        {
+            CancellationToken.ThrowIfCancellationRequested();
+
+            Process? Process = TryFindNewGameProcess(ExistingJavaProcessIds, LaunchStartUtc);
+            if (Process is not null)
+            {
+                return Process;
+            }
+
+            await Task.Delay(500, CancellationToken).ConfigureAwait(false);
+        }
+
+        return TryFindRunningGameProcess();
+    }
+
+    private Process? TryFindNewGameProcess(HashSet<int> ExistingJavaProcessIds, DateTime LaunchStartUtc)
+    {
+        foreach (Process Process in GetJavaProcesses())
+        {
+            try
+            {
+                if (ExistingJavaProcessIds.Contains(Process.Id))
+                {
+                    continue;
+                }
+
+                if (Process.StartTime.ToUniversalTime() < LaunchStartUtc.AddSeconds(-2))
+                {
+                    continue;
+                }
+
+                string CommandLine = GetProcessCommandLine(Process.Id);
+                if (IsGameProcessCommandLine(CommandLine))
+                {
+                    return Process;
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        return null;
+    }
+
+    private Process? TryFindRunningGameProcess()
+    {
+        foreach (Process Process in GetJavaProcesses())
+        {
+            try
+            {
+                string CommandLine = GetProcessCommandLine(Process.Id);
+                if (IsGameProcessCommandLine(CommandLine))
+                {
+                    return Process;
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        return null;
+    }
+
+    private HashSet<int> GetJavaProcessIds()
+    {
+        return GetJavaProcesses().Select(Value => Value.Id).ToHashSet();
+    }
+
+    private static IEnumerable<Process> GetJavaProcesses()
+    {
+        foreach (Process Process in Process.GetProcesses())
+        {
+            string Name;
+
+            try
+            {
+                Name = Process.ProcessName;
+            }
+            catch
+            {
+                continue;
+            }
+
+            if (string.Equals(Name, "java", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(Name, "javaw", StringComparison.OrdinalIgnoreCase))
+            {
+                yield return Process;
+            }
+        }
+    }
+
+    private string GetProcessCommandLine(int ProcessId)
+    {
+        try
+        {
+            using var Searcher = new ManagementObjectSearcher(
+                $"SELECT CommandLine FROM Win32_Process WHERE ProcessId = {ProcessId}");
+
+            using ManagementObjectCollection Results = Searcher.Get();
+            foreach (ManagementObject Item in Results)
+            {
+                return Item["CommandLine"]?.ToString() ?? string.Empty;
+            }
+        }
+        catch
+        {
+        }
+
+        return string.Empty;
+    }
+
+    private bool IsGameProcessCommandLine(string CommandLine)
+    {
+        if (string.IsNullOrWhiteSpace(CommandLine))
+        {
+            return false;
+        }
+
+        return CommandLine.Contains(Paths.GameDirectory, StringComparison.OrdinalIgnoreCase) ||
+               CommandLine.Contains(Paths.RootDirectory, StringComparison.OrdinalIgnoreCase) ||
+               CommandLine.Contains("-Dminecraft.client.jar", StringComparison.OrdinalIgnoreCase) ||
+               CommandLine.Contains("net.minecraft.client.main.Main", StringComparison.OrdinalIgnoreCase) ||
+               CommandLine.Contains("cpw.mods.bootstraplauncher.BootstrapLauncher", StringComparison.OrdinalIgnoreCase);
     }
 }

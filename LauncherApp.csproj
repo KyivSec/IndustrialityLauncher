@@ -11,21 +11,30 @@
 	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 	<SelfContained>true</SelfContained>
 	<PublishSingleFile>true</PublishSingleFile>
-	<PublishTrimmed>false</PublishTrimmed>
+	<PublishTrimmed>true</PublishTrimmed>
 	<PublishReadyToRun>false</PublishReadyToRun>
     <PublishProfile>win-$(Platform).pubxml</PublishProfile>
     <UseWinUI>true</UseWinUI>
     <WinUISDKReferences>false</WinUISDKReferences>
     <EnableMsixTooling>true</EnableMsixTooling>
     <Nullable>enable</Nullable>
+    <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="LauncherJsonContext.cs" />
     <Compile Remove="Assets\Backgrounds\**" />
     <Content Remove="Assets\Backgrounds\**" />
     <EmbeddedResource Remove="Assets\Backgrounds\**" />
     <None Remove="Assets\Backgrounds\**" />
     <Page Remove="Assets\Backgrounds\**" />
   </ItemGroup>
+
+	<ItemGroup>
+		<TrimmerRootAssembly Include="CmlLib.Core" />
+		<TrimmerRootAssembly Include="CmlLib.Core.Installer.NeoForge" />
+	</ItemGroup>
+	
   <ItemGroup>
     <Content Remove="Assets\BadgeLogo.scale-100.png" />
     <Content Remove="Assets\BadgeLogo.scale-125.png" />
@@ -65,12 +74,14 @@
     <ProjectCapability Include="Msix" />
   </ItemGroup>
   <ItemGroup>
+    <TrimmerRootDescriptor Include="TrimmerRoots.xml" />
     <PackageReference Include="CmlLib.Core" Version="4.0.6" />
     <PackageReference Include="CmlLib.Core.Installer.NeoForge" Version="4.0.0" />
     <PackageReference Include="Interop.IWshRuntimeLibrary" Version="1.0.1" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7705" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260209005" />
     <PackageReference Include="System.IO.Compression" Version="4.3.0" />
+    <PackageReference Include="System.Management" Version="10.0.5" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <WebView2LoaderPreference>Dynamic</WebView2LoaderPreference>

@@ -1,0 +1,9 @@
+<linker>
+  <assembly fullname="CmlLib.Core.Installer.NeoForge">
+    <type fullname="CmlLib.Core.Installer.NeoForge.MNeoForgeInstaller" preserve="all" />
+    <type fullname="CmlLib.Core.Installer.NeoForge.MNeoForgeInstallOptions" preserve="all" />
+  </assembly>
+  <assembly fullname="CmlLib.Core">
+    <type fullname="CmlLib.Core.MLaunchOption" preserve="all" />
+  </assembly>
+</linker>

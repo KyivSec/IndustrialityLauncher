@@ -6,7 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Windows.UI;
 
-namespace LauncherApp.Services;
+namespace LauncherApp;
 
 public sealed class InstallProgressWindow : Window
 {
