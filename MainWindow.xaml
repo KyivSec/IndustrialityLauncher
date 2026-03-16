@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="LauncherApp.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Industriality Launcher">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid
+            x:Name="AppTitleBar"
+            Grid.Row="0"
+            Background="Transparent">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel
+                Orientation="Horizontal"
+                Spacing="10"
+                Margin="14,0,0,0"
+                VerticalAlignment="Center">
+                <Image
+                    Width="16"
+                    Height="16"
+                    Source="ms-appx:///Assets/icon.png" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="13"
+                    FontWeight="SemiBold"
+                    Text="Industriality Launcher" />
+            </StackPanel>
+        </Grid>
+
+        <NavigationView
+            Grid.Row="1"
+            x:Name="RootNavigationView"
+            PaneDisplayMode="Left"
+            IsBackButtonVisible="Collapsed"
+            IsSettingsVisible="False"
+            SelectionChanged="RootNavigationView_SelectionChanged">
+
+            <NavigationView.MenuItems>
+                <NavigationViewItem
+                    x:Name="ModpackNavItem"
+                    Content="Modpack"
+                    Icon="Library" />
+                <NavigationViewItem
+                    x:Name="SettingsNavItem"
+                    Content="Settings"
+                    Icon="Setting" />
+            </NavigationView.MenuItems>
+
+            <Grid Padding="20">
+                <Grid x:Name="ModpackPage">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Border
+                        Grid.Row="0"
+                        Padding="0"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="20"
+                        MinHeight="360">
+
+                        <Grid
+                            x:Name="BackgroundHost"
+                            SizeChanged="BackgroundHost_SizeChanged">
+
+                            <Grid.Clip>
+                                <RectangleGeometry x:Name="BackgroundClipRect" />
+                            </Grid.Clip>
+
+                            <Image
+                                x:Name="BackgroundImage"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                Stretch="UniformToFill" />
+
+                            <Grid VerticalAlignment="Bottom">
+                                <Rectangle Height="220" VerticalAlignment="Bottom">
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#00000000" Offset="0.0" />
+                                            <GradientStop Color="#99000000" Offset="1.0" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+
+                                <Grid
+                                    Padding="24"
+                                    VerticalAlignment="Bottom">
+                                    <StackPanel
+                                        VerticalAlignment="Bottom"
+                                        Spacing="2"
+                                        HorizontalAlignment="Left">
+                                        <Image
+                                            Width="96"
+                                            Height="96"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Bottom"
+                                            Stretch="Uniform"
+                                            Source="ms-appx:///Assets/Industriality.png" />
+                                        <TextBlock
+                                            Margin="0,8,0,0"
+                                            FontSize="32"
+                                            FontWeight="SemiBold"
+                                            Foreground="White"
+                                            Text="Industriality" />
+                                        <TextBlock
+                                            FontSize="14"
+                                            Foreground="#D0FFFFFF"
+                                            Text="1.0.0" />
+                                    </StackPanel>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <Grid
+                        Grid.Row="1"
+                        Margin="0,16,0,0"
+                        HorizontalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Button
+                            x:Name="InstallButton"
+                            Grid.Column="0"
+                            Height="52"
+                            HorizontalAlignment="Stretch"
+                            Click="InstallButton_Click">
+                            <StackPanel
+                                Orientation="Horizontal"
+                                Spacing="10"
+                                HorizontalAlignment="Center">
+                                <FontIcon Glyph="&#xE896;" />
+                                <TextBlock Text="Install" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button
+                            x:Name="PlayButton"
+                            Grid.Column="2"
+                            Height="52"
+                            HorizontalAlignment="Stretch"
+                            IsEnabled="False"
+                            Click="PlayButton_Click">
+                            <StackPanel
+                                Orientation="Horizontal"
+                                Spacing="10"
+                                HorizontalAlignment="Center">
+                                <FontIcon Glyph="&#xE768;" />
+                                <TextBlock Text="Play" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button
+                            x:Name="UpdateButton"
+                            Grid.Column="4"
+                            Height="52"
+                            HorizontalAlignment="Stretch"
+                            Click="UpdateButton_Click">
+                            <StackPanel
+                                Orientation="Horizontal"
+                                Spacing="10"
+                                HorizontalAlignment="Center">
+                                <FontIcon Glyph="&#xE777;" />
+                                <TextBlock Text="Update" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                </Grid>
+
+                <ScrollViewer
+                    x:Name="SettingsScrollViewer"
+                    Visibility="Collapsed"
+                    VerticalScrollBarVisibility="Auto"
+                    HorizontalScrollBarVisibility="Disabled"
+                    VerticalScrollMode="Auto"
+                    HorizontalScrollMode="Disabled">
+
+                    <Grid x:Name="SettingsPage">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="20" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="20" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Border
+                            Grid.Row="0"
+                            Padding="28"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Top"
+                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="20"
+                            MinHeight="220">
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock
+                                    Grid.Row="0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="24"
+                                    FontWeight="SemiBold"
+                                    Text="Profile Settings" />
+
+                                <Grid
+                                    Grid.Row="1"
+                                    VerticalAlignment="Center"
+                                    MaxWidth="900"
+                                    Margin="0,24,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="16" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        VerticalAlignment="Center"
+                                        Text="Username" />
+
+                                    <TextBox
+                                        x:Name="UsernameTextBox"
+                                        Grid.Column="2"
+                                        HorizontalAlignment="Stretch"
+                                        PlaceholderText="Enter username"
+                                        TextChanged="UsernameTextBox_TextChanged" />
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <Border
+                            Grid.Row="2"
+                            Padding="28"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Top"
+                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="20"
+                            MinHeight="260">
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock
+                                    Grid.Row="0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="24"
+                                    FontWeight="SemiBold"
+                                    Text="Java Settings" />
+
+                                <Grid
+                                    Grid.Row="1"
+                                    VerticalAlignment="Center"
+                                    MaxWidth="900"
+                                    Margin="0,24,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="16" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="16" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        Grid.Column="0"
+                                        VerticalAlignment="Center"
+                                        Text="Minimum RAM (MB)" />
+
+                                    <NumberBox
+                                        x:Name="MinRamNumberBox"
+                                        Grid.Row="0"
+                                        Grid.Column="2"
+                                        HorizontalAlignment="Stretch"
+                                        Minimum="512"
+                                        SmallChange="512"
+                                        SpinButtonPlacementMode="Inline"
+                                        Value="512"
+                                        ValueChanged="RamNumberBox_ValueChanged" />
+
+                                    <TextBlock
+                                        Grid.Row="2"
+                                        Grid.Column="0"
+                                        VerticalAlignment="Center"
+                                        Text="Maximum RAM (MB)" />
+
+                                    <NumberBox
+                                        x:Name="MaxRamNumberBox"
+                                        Grid.Row="2"
+                                        Grid.Column="2"
+                                        HorizontalAlignment="Stretch"
+                                        Minimum="1024"
+                                        SmallChange="512"
+                                        SpinButtonPlacementMode="Inline"
+                                        Value="4096"
+                                        ValueChanged="RamNumberBox_ValueChanged" />
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <StackPanel
+                            Grid.Row="4"
+                            Orientation="Horizontal"
+                            Spacing="12"
+                            HorizontalAlignment="Left">
+                            <Button
+                                x:Name="OpenFolderButton"
+                                Content="Open Folder"
+                                Click="OpenFolderButton_Click" />
+                            <Button
+                                x:Name="DeleteModpackButton"
+                                Content="Delete Modpack"
+                                Click="DeleteModpackButton_Click" />
+                        </StackPanel>
+
+                    </Grid>
+                </ScrollViewer>
+            </Grid>
+        </NavigationView>
+    </Grid>
+</Window>
